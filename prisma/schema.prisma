@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  firstName String @map("first_name") 
+  lastName String @map("last_name")
+  email String @unique()
+  password String
+  columns Column[]
+  card Card[]
+  comments Comment[]
+
+  @@map("users")
+}
+
+model Column {
+  id Int @id @default(autoincrement())
+  title String
+  userId Int @map("user_id")
+  user User @relation(fields: [userId], references: [id])
+  isActive Boolean @default(true) @map("is_active")
+  cards Card[]
+
+  @@map("columns")
+}
+
+model Card {
+  id Int @id() @default(autoincrement())
+  title String
+  description String @db.Text
+  columnId Int @map("column_id")
+  column Column @relation(fields: [columnId], references: [id])
+  userId Int @map("user_id")
+  user User @relation(fields: [userId], references: [id])
+  isActive Boolean @default(true) @map("is_active")
+  comments Comment[]
+
+  @@map("cards")
+}
+
+model Comment {
+  id Int @id() @default(autoincrement())
+  text String
+  isActive Boolean @default(true) @map("is_active")
+  cardId Int @map("card_id")
+  card Card @relation(fields: [cardId], references: [id])
+  userId Int @map("user_id")
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("comments")
+}
